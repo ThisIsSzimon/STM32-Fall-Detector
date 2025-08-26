@@ -39,13 +39,13 @@ Dane pomiarowe są przesyłane cyklicznie do komputera i mogą być przetwarzane
 ## 5. Programy do odbioru danych
 ### 5.1. `rx_adxl.py`
 Skrypt w Pythonie umożliwiający odczyt danych i wyświetlanie ich w konsoli.
-(tu zdjęcie)
+![Instrukcja](Plots/rx_1.png)
 ### 5.2. `rx_adxl_visualization.py`
 Program do wizualizacji danych w czasie rzeczywistym na wykresach.
 (tu zdjęcie)
 ### 5.3 `rx_adxl_with_ml.py`
 Program który łączył algorytm manualny z uczeniem maszynowym
-(tu zdjęcie)
+![Instrukcja](Plots/rx_okno.png)
 
 ## 6. Algorytm manualny
 W implementacji manualnej wykorzystano proste warunki:
