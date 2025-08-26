@@ -126,7 +126,7 @@ Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, poni
 
 ## 8. Analiza danych w Jupyter Notebook
 ### 8.1. Wykrywanie upadku przez algorytm manualny
-TUTAJ OBRAZEK
+![Instrukcja](Plots/manual.png)
 ### 8.2. Wykrywanie upadku przez model
 TUTAJ OBRAZEK JAK NAUCZONY MODEL
 Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle:
