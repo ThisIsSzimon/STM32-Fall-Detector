@@ -128,12 +128,12 @@ Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, poni
 ### 8.1. Wykrywanie upadku przez algorytm manualny
 ![Instrukcja](Plots/manual.png)
 ### 8.2. Wykrywanie upadku przez model
-TUTAJ OBRAZEK JAK NAUCZONY MODEL
+![Instrukcja](Plots/model.png)
 Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle:
 - odbierał dane z akcelerometru,
 - stosował algorytm manualny,
 - oraz predykcję ML.
-TUTAJ OBRAZEK POROWNANIE METOD
+![Instrukcja](Plots/modelvsmanual.png)
 
 ## 9. Możliwe rozszerzenia
 - Wdrożenie modelu ML bezpośrednio na mikrokontrolerze (np. przy użyciu **STM32Cube.AI**).
