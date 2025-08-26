@@ -13,21 +13,41 @@ Najważniejsze ręczne zmiany w kodzie źródłowym znajdują się w plikach:
 
 Pozostałe pliki zostały wygenerowane i modyfikowane automatycznie przez środowisko STM32CubeIDE.
 
-## 2. Komunikacja
+## 2. Środowisko programistyczne
+- **STM32CubeIDE** – główne środowisko programistyczne do konfiguracji i pisania kodu na STM32F103.
+- **Dodatkowe narzędzia** – Python 3.11, biblioteki: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `xgboost`, Jupyter Notebook.
+
+## 3. Instrukcja uruchomienia projektu
+1. W STM32CubeIDE należy wybrać odpowiedni mikrokontroler (STM32F103).
+2. Skonfigurować wejścia/wyjścia oraz interfejsy komunikacyjne:
+   - I2C dla komunikacji z ADXL345,
+   - USB (CDC) dla przesyłania danych do PC.
+3. Wgrać program do mikrokontrolera.
+4. Uruchomić jeden z programów w Pythonie:
+   - `rx_adxl.py` – do odczytu w konsoli,
+   - `rx_adxl_visualization.py` – do wizualizacji na wykresie,
+   - `rx_adxl_with_ml.py` – do łączenia algorytmu manualnego i ML.
+5. Programy w Pythonie kończymy za pomocą `Ctrl+C` (**KeyInterrupt**). Dane automatycznie zapisują się do pliku `.csv`.
+6. Dane można następnie analizować w Jupyter Notebook.
+
+## 4. Komunikacja
 W projekcie zastosowano dwie magistrale komunikacyjne:
 - **I2C** – komunikacja pomiędzy akcelerometrem ADXL345 a mikrokontrolerem STM32.
 - **USB** (CDC) – komunikacja pomiędzy STM32 a komputerem PC.
 Dane pomiarowe są przesyłane cyklicznie do komputera i mogą być przetwarzane na różne sposoby.
 
-## 3. Programy do odbioru danych
-### 4.1. `rx_adxl.py`
+## 5. Programy do odbioru danych
+### 5.1. `rx_adxl.py`
 Skrypt w Pythonie umożliwiający odczyt danych i wyświetlanie ich w konsoli.
 (tu zdjęcie)
-### 4.2. `rx_adxl_visualization.py`
+### 5.2. `rx_adxl_visualization.py`
 Program do wizualizacji danych w czasie rzeczywistym na wykresach.
 (tu zdjęcie)
+### 5.3 `rx_adxl_with_ml.py`
+Program który łączył algorytm manualny z uczeniem maszynowym
+(tu zdjęcie)
 
-## 4. Algorytm manualny
+## 6. Algorytm manualny
 W implementacji manualnej wykorzystano proste warunki:
 - jeśli wartość przyspieszenia spadła poniżej określonego progu (`FREEFALL_LIMIT_MS2`), licznik `freeFallCount` był inkrementowany,
 - licznik ten był resetowany, gdy sygnał wracał do normy szybciej niż po x próbkach (TUTAJ SPRAWDZ NAZWE ZMIENNEJ I NAPISZ)
@@ -47,17 +67,29 @@ Parametry wykrywania upadku:
 - **IMPACT_THRESHOLD** – minimalna wartość przyspieszenia po spadku, interpretowana jako uderzenie.
 - **IMPACT_DELTA_MIN** – różnica wartości między kolejnymi próbkami, aby odróżnić uderzenie od machania.
 - **DEBOUNCE_TIME_MS** – minimalny czas pomiędzy kolejnymi detekcjami upadków.
+### Ograniczenia algorytmu manualnego
+- wrażliwość na ustawione parametry progowe,
+- trudności z odróżnieniem nietypowych ruchów od faktycznego upadku,
+- możliwe fałszywe alarmy przy szybkim machaniu modułem.
 
-## 5. Uczenie maszynowe
-### 5.1. Okna czasowe
-Dane z akcelerometru są bardzo szumne, dlatego pojedyncze próbki nie wystarczają do rozpoznania upadku.  
-Zamiast tego stosowano **okna czasowe** (np. 150–160 próbek).
+## 7. Uczenie maszynowe
+### 7.1. Okna czasowe
+Pojedyńcza próbka `X, Y, Z` nie niesie wystarczającej informacji. Zamiast tego stosowano **okna czasowe** (np. 150–160 próbek).
 Dla każdego okna liczono dodatkowe cechy (features), aby ująć **dynamikę sygnału w czasie**, a nie tylko chwilowe wartości.
 
-### 5.2. Ekstrahowane cechy
+### 7.2. Ekstrahowane cechy
 Dla każdej osi **X, Y, Z**, a także sygnałów pochodnych:
 - **A** – całkowite przyspieszenie (`sqrt(X^2 + Y^2 + Z^2)`) TUTAJ SPRAWDZ CZY DA SIE ROWNANIE NAPISAC,
 - **DX, DY, DZ, DA** – różnice kolejnych próbek,
+```python
+df = pd.read_csv('data/nowe_dane.csv')
+df["A"] = np.sqrt(df["X"]**2 + df["Y"]**2 + df["Z"]**2)
+df["DX"] = df["X"].diff().fillna(0)
+df["DY"] = df["Y"].diff().fillna(0)
+df["DZ"] = df["Z"].diff().fillna(0)
+df["DA"] = df["A"].diff().fillna(0)
+df.to_csv("data/train_features.csv", index=False)
+```
 
 wyliczano zestaw cech statystycznych:
 - średnia (`mean`),
@@ -65,18 +97,46 @@ wyliczano zestaw cech statystycznych:
 - minimum i maksimum,
 - zakres (max – min),
 - energia sygnału (`sum(x^2)`).
+```python
+def extract_features(window):
+    features = {}
+    for col in ["X", "Y", "Z", "A", "DX", "DY", "DZ", "DA"]:
+        data = window[col]
+        features[f"{col}_mean"] = data.mean()
+        features[f"{col}_std"] = data.std()
+        features[f"{col}_min"] = data.min()
+        features[f"{col}_max"] = data.max()
+        features[f"{col}_range"] = data.max() - data.min()
+        features[f"{col}_energy"] = np.sum(data**2)
+    features["FALL"] = window["FALL"].max()
+    return features
+```
 
 Te cechy tworzyły wektor wejściowy dla modelu ML.
 
-### 5.3. Modele ML
+### 7.3. Modele ML
 Przetestowane modele:
 - **Random Forest** (200 drzew, z balansowaniem klas),
 - **XGBoost** (200 drzew, `scale_pos_weight` dla klas niezrównoważonych).
+Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, ponieważ dawał wysoką dokładność i był prostszy do wdrożenia.
+### Zalety uczenia maszynowego
+- większa odporność na nietypowe ruchy,
+- możliwość adaptacji modelu do nowych danych,
+- mniejsza liczba fałszywych alarmów.
 
-Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, ponieważ:
-- dawał stabilniejsze wyniki,
-- był prostszy do implementacji i eksportu (pickle → później możliwość konwersji do C). TUTAJ SPRAWDZ CYZ NAPEWNO
+## 8. Analiza danych w Jupyter Notebook
+### 8.1. Wykrywanie upadku przez algorytm manualny
+TUTAJ OBRAZEK
+### 8.2. Wykrywanie upadku przez model
+TUTAJ OBRAZEK JAK NAUCZONY MODEL
+Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle:
+- odbierał dane z akcelerometru,
+- stosował algorytm manualny,
+- oraz predykcję ML.
+TUTAJ OBRAZEK POROWNANIE METOD
 
-## 5. Analiza danych w Jupyter Notebook
-
-### 5.1. Wykrywanie upadku przez algorytm manualny
+## 9. Możliwe rozszerzenia
+- Wdrożenie modelu ML bezpośrednio na mikrokontrolerze (np. przy użyciu **STM32Cube.AI**).
+- Dodanie komunikacji bezprzewodowej (Bluetooth, WiFi) zamiast USB.
+- Rozszerzenie o dodatkowe czujniki (np. żyroskop, barometr).
+- Wprowadzenie klasyfikacji typów upadków (np. upadek do przodu, na bok, do tyłu).
