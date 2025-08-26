@@ -15,7 +15,7 @@ Pozostałe pliki zostały wygenerowane i modyfikowane automatycznie przez środo
 
 ## 2. Środowisko programistyczne
 - **STM32CubeIDE** – główne środowisko programistyczne do konfiguracji i pisania kodu na STM32F103.
-- **Dodatkowe narzędzia** – Python 3.11, biblioteki: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `xgboost`, Jupyter Notebook.
+- **Dodatkowe narzędzia** – Python 3.11, biblioteki: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `xgboost`, `joblib`, `csv`, `serial`, `pyqtgraph`, `PyQt5`
 
 ## 3. Instrukcja uruchomienia projektu
 1. W STM32CubeIDE należy wybrać odpowiedni mikrokontroler (STM32F103).
