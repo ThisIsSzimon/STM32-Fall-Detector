@@ -39,13 +39,35 @@ Dane pomiarowe są przesyłane cyklicznie do komputera i mogą być przetwarzane
 ## 5. Programy do odbioru danych
 ### 5.1. `rx_adxl.py`
 Skrypt w Pythonie umożliwiający odczyt danych i wyświetlanie ich w konsoli.
-![Instrukcja](Plots/rx_1.png)
+```text
+X, Y, Z, FALL
+7.27, -7.31, 0.99, 0
+7.27, -7.31, 0.99, 0
+7.27, -7.31, 0.99, 0
+7.27, -7.31, 0.96, 0
+7.27, -7.31, 0.96, 0
+7.27, -7.31, 0.96, 0
+7.27, -7.31, 0.96, 0
+```
 ### 5.2. `rx_adxl_visualization.py`
 Program do wizualizacji danych w czasie rzeczywistym na wykresach.
-(tu zdjęcie)
+![Instrukcja](Plots/vis.png)
 ### 5.3 `rx_adxl_with_ml.py`
 Program który łączył algorytm manualny z uczeniem maszynowym
-![Instrukcja](Plots/rx_okno.png)
+```text
+X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
+X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
+X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
+
+--- OKNO #34 ---
+{'X_mean': 5.46, 'Y_mean': -1.98, 'Z_mean': 5.33, 'A_mean': 9.45, 'DX_mean': -0.09, 'DY_mean': 0.07, 'DZ_mean': -0.07, 'DA_mean': -0.04, 'FALL': 0}
+Predykcja ML: 0
+---------------
+
+X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
+X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
+X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
+```
 
 ## 6. Algorytm manualny
 W implementacji manualnej wykorzystano proste warunki:
