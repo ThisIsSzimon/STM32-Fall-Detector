@@ -29,9 +29,9 @@ Other files were generated and automatically modified by STM32CubeIDE.
     -   USB (CDC) for data transfer to PC.
 3.  Flash the program to the microcontroller.
 4.  Run one of the Python programs:
-    -   `rx_adxl.py` -- for console data readout,
-    -   `rx_adxl_visualization.py` -- for real-time visualization,
-    -   `rx_adxl_with_ml.py` -- for combining manual algorithm and ML
+    -   `rx_adxl.py` - for console data readout,
+    -   `rx_adxl_visualization.py` - for real-time visualization,
+    -   `rx_adxl_with_ml.py` - for combining manual algorithm and ML
         model.
 5.  Python programs are stopped with `Ctrl+C` (**KeyInterrupt**). Data is automatically saved into a `.csv` file.
 6.  Data can then be analyzed in Jupyter Notebook.
