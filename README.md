@@ -151,10 +151,9 @@ Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, poni
 ![Instrukcja](Plots/manual.png)
 ### 8.2. Wykrywanie upadku przez model
 ![Instrukcja](Plots/model.png)
-Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle:
-- odbierał dane z akcelerometru,
-- stosował algorytm manualny,
-- oraz predykcję ML.
+### 8.3. Porównanie algorytmów
+Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle odbierał dane, stosował algorytm manualny oraz predykcję modelu.
+W sygnale testowym były dwa rzeczywiste upadki, które zostały poprawnie wykryte przez model.
 ![Instrukcja](Plots/modelvsmanual.png)
 
 ## 9. Możliwe rozszerzenia
