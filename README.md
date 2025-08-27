@@ -71,11 +71,10 @@ X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
 
 ## 6. Algorytm manualny
 W implementacji manualnej wykorzystano proste warunki:
-- jeśli wartość przyspieszenia spadła poniżej określonego progu (`FREEFALL_LIMIT_MS2`), licznik `freeFallCount` był inkrementowany,
-- licznik ten był resetowany, gdy sygnał wracał do normy szybciej niż po x próbkach (TUTAJ SPRAWDZ NAZWE ZMIENNEJ I NAPISZ)
-- aby uznać zdarzenie za upadek, musiało to trwać przez określoną liczbę próbek (np. 30–50),
-- dodatkowy warunek na minimalną różnicę między kolejnymi próbkami (np. > 20), aby odróżnić upadek od machania ręką,
-- dodatkowo po spadku musiał nastąpić szybki wzrost (peak) sygnału.
+- jeśli wartość przyspieszenia spadła poniżej określonego progu `FREEFALL_LIMIT_MS2`, licznik `freeFallCount` był inkrementowany,
+- licznik ten był resetowany, gdy sygnał wracał do normy szybciej niż po `FREEFALL_MIN_SAMPLES` próbkach,
+- dodatkowy warunek na minimalną różnicę między kolejnymi próbkami `IMPACT_DELTA_MIN`, aby odróżnić upadek od machania ręką,
+- dodatkowo po spadku musiał nastąpić szybki wzrost (peak) sygnału `IMPACT_DELTA_MIN`.
 Parametry wykrywania upadku:
 ```c
 #define FREEFALL_LIMIT_MS2   6.0f
@@ -101,7 +100,7 @@ Dla każdego okna liczono dodatkowe cechy (features), aby ująć **dynamikę syg
 
 ### 7.2. Ekstrahowane cechy
 Dla każdej osi **X, Y, Z**, a także sygnałów pochodnych:
-- **A** – całkowite przyspieszenie (`sqrt(X^2 + Y^2 + Z^2)`) TUTAJ SPRAWDZ CZY DA SIE ROWNANIE NAPISAC,
+- **A** – całkowite przyspieszenie $\sqrt{X^2 + Y^2 + Z^2}$,
 - **DX, DY, DZ, DA** – różnice kolejnych próbek,
 ```python
 df = pd.read_csv('data/nowe_dane.csv')
@@ -114,11 +113,11 @@ df.to_csv("data/train_features.csv", index=False)
 ```
 
 wyliczano zestaw cech statystycznych:
-- średnia (`mean`),
-- odchylenie standardowe (`std`),
-- minimum i maksimum,
-- zakres (max – min),
-- energia sygnału (`sum(x^2)`).
+- średnia `mean`,
+- odchylenie standardowe `std`,
+- minimum i maksimum `min`,`max`,
+- zakres `max – min`,
+- energia sygnału `sum(x^2)`.
 ```python
 def extract_features(window):
     features = {}
