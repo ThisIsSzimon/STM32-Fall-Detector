@@ -1,109 +1,115 @@
-# Wykrywanie upadku z użyciem ADXL345 i STM32F103
+# Fall Detection using ADXL345 and STM32F103
 
-## 1. Wprowadzenie
-Projekt ma na celu wykrywanie upadku z wykorzystaniem akcelerometru ADXL345 oraz mikrokontrolera STM32F103.
-Dane z czujnika są przesyłane do komputera przez interfejs USB, gdzie mogą być analizowane i wizualizowane.
-Opracowano dwa podejścia:
-1. **Algorytm manualny** - oparty o progi i analize próbek z czujnika
-2. **Model uczenia maszynowego** - oparty o klasyfikator trenujący się na zbiorach danych przy pracy czujnika
+## 1. Introduction
 
-Najważniejsze ręczne zmiany w kodzie źródłowym znajdują się w plikach:
-- `main.c` – główna logika programu, wykrywanie upadku, konfiguracja parametrów.
-- `adxl345.c` – obsługa komunikacji z czujnikiem ADXL345.
+The project aims to detect falls using the ADXL345 accelerometer and the
+STM32F103 microcontroller.\
+Sensor data is transmitted to a computer via USB, where it can be
+analyzed and visualized.\
+Two approaches were developed: 
+1. **Manual algorithm** - based on thresholds and sensor sample analysis
+2. **Machine learning model** - based on a classifier trained on datasets collected from the sensor
 
-Pozostałe pliki zostały wygenerowane i modyfikowane automatycznie przez środowisko STM32CubeIDE.
+The most important manual changes in the source code are located in: 
+- `main.c` - main program logic, fall detection, parameter configuration. 
+- `adxl345.c` - communication handling with the ADXL345 sensor.
 
-## 2. Środowisko programistyczne
-- **STM32CubeIDE** – główne środowisko programistyczne do konfiguracji i pisania kodu na STM32F103.
-- **Dodatkowe narzędzia** – Python 3.11, biblioteki: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `xgboost`, `joblib`, `csv`, `serial`, `pyqtgraph`, `PyQt5`
+Other files were generated and automatically modified by STM32CubeIDE.
 
-## 3. Instrukcja uruchomienia projektu
-1. W STM32CubeIDE należy wybrać odpowiedni mikrokontroler (STM32F103).
-2. Skonfigurować wejścia/wyjścia oraz interfejsy komunikacyjne:
-   - I2C dla komunikacji z ADXL345,
-   - USB (CDC) dla przesyłania danych do PC.
-3. Wgrać program do mikrokontrolera.
-4. Uruchomić jeden z programów w Pythonie:
-   - `rx_adxl.py` – do odczytu w konsoli,
-   - `rx_adxl_visualization.py` – do wizualizacji na wykresie,
-   - `rx_adxl_with_ml.py` – do łączenia algorytmu manualnego i ML.
-5. Programy w Pythonie kończymy za pomocą `Ctrl+C` (**KeyInterrupt**). Dane automatycznie zapisują się do pliku `.csv`.
-6. Dane można następnie analizować w Jupyter Notebook.
+## 2. Development Environment
 
-## 4. Komunikacja
-W projekcie zastosowano dwie magistrale komunikacyjne:
-- **I2C** – komunikacja pomiędzy akcelerometrem ADXL345 a mikrokontrolerem STM32.
-- **USB** (CDC) – komunikacja pomiędzy STM32 a komputerem PC.
-Dane pomiarowe są przesyłane cyklicznie do komputera i mogą być przetwarzane na różne sposoby.
+- **STM32CubeIDE** - the main development environment for STM32F103 configuration and coding.
+- **Additional tools** - Python 3.11, libraries: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `xgboost`, `joblib`, `csv`, `serial`, `pyqtgraph`, `PyQt5`
 
-## 5. Programy do odbioru danych
+## 3. Project Setup Instructions
+
+1.  In STM32CubeIDE, select the correct microcontroller (STM32F103).
+2.  Configure inputs/outputs and communication interfaces:
+    -   I2C for communication with ADXL345,
+    -   USB (CDC) for data transfer to PC.
+3.  Flash the program to the microcontroller.
+4.  Run one of the Python programs:
+    -   `rx_adxl.py` -- for console data readout,
+    -   `rx_adxl_visualization.py` -- for real-time visualization,
+    -   `rx_adxl_with_ml.py` -- for combining manual algorithm and ML
+        model.
+5.  Python programs are stopped with `Ctrl+C` (**KeyInterrupt**). Data is automatically saved into a `.csv` file.
+6.  Data can then be analyzed in Jupyter Notebook.
+
+## 4. Communication
+
+Two communication buses are used in this project: 
+- **I2C** - between ADXL345 accelerometer and STM32 microcontroller,
+- **USB** (CDC) - between STM32 and PC. Measurement data is cyclically transmitted to the PC and can be processed in various ways.
+
+## 5. Data Reception Programs
+
 ### 5.1. `rx_adxl.py`
-Skrypt w Pythonie umożliwiający odczyt danych i wyświetlanie ich w konsoli.
-```text
+
+Python script for reading and displaying data in the console.
+
+``` text
 X, Y, Z, FALL
 7.27, -7.31, 0.99, 0
 7.27, -7.31, 0.99, 0
 7.27, -7.31, 0.99, 0
 7.27, -7.31, 0.96, 0
-7.27, -7.31, 0.96, 0
-7.27, -7.31, 0.96, 0
-7.27, -7.31, 0.96, 0
 ```
+
 ### 5.2. `rx_adxl_visualization.py`
-Program do wizualizacji danych w czasie rzeczywistym na wykresach.
-![Instrukcja](Plots/vis.png)
-### 5.3 `rx_adxl_with_ml.py`
-Program który łączył algorytm manualny z uczeniem maszynowym
-```text
-X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
-X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
+
+Program for real-time visualization of sensor data.
+![Visualization](Plots/vis.png)
+### 5.3. `rx_adxl_with_ml.py` 
+Program combining manual algorithm with ML model prediction.
+
+``` text
 X=-3.86, Y=5.01, Z=-3.48, FALL_HW=0
 
---- OKNO #34 ---
+--- WINDOW #34 ---
 {'X_mean': 5.46, 'Y_mean': -1.98, 'Z_mean': 5.33, 'A_mean': 9.45, 'DX_mean': -0.09, 'DY_mean': 0.07, 'DZ_mean': -0.07, 'DA_mean': -0.04, 'FALL': 0}
-Predykcja ML: 0
+ML Prediction: 0
 ---------------
-
-X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
-X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
-X=-2.53, Y=-3.37, Z=-9.83, FALL_HW=0
 ```
 
-## 6. Algorytm manualny
-W implementacji manualnej wykorzystano proste warunki:
-- jeśli wartość przyspieszenia spadła poniżej określonego progu `FREEFALL_LIMIT_MS2`, licznik `freeFallCount` był inkrementowany,
-- licznik ten był resetowany, gdy sygnał wracał do normy szybciej niż po `FREEFALL_MIN_SAMPLES` próbkach,
-- dodatkowy warunek na minimalną różnicę między kolejnymi próbkami `IMPACT_DELTA_MIN`, aby odróżnić upadek od machania ręką,
-- dodatkowo po spadku musiał nastąpić szybki wzrost (peak) sygnału `IMPACT_DELTA_MIN`.
-Parametry wykrywania upadku:
-```c
+## 6. Manual Algorithm
+
+The manual implementation used simple conditions: 
+- if acceleration dropped below `FREEFALL_LIMIT_MS2`, a counter `freeFallCount` was
+incremented,
+- the counter was reset if the signal returned to normal faster than `FREEFALL_MIN_SAMPLES`,
+- an additional condition `IMPACT_DELTA_MIN` required a minimum difference between consecutive samples to avoid false triggers from hand waving,
+- after a fall, a quick peak above `IMPACT_THRESHOLD` had to follow.
+
+Detection parameters:
+``` c
 #define FREEFALL_LIMIT_MS2   6.0f
 #define FREEFALL_MIN_SAMPLES 200
 #define IMPACT_THRESHOLD     50.0f
 #define IMPACT_DELTA_MIN     20.0f
 #define DEBOUNCE_TIME_MS     1000
 ```
-- **FREEFALL_LIMIT_MS2** – graniczna wartość przyspieszenia (m/s²), poniżej której traktujemy ruch jako swobodny spadek.
-- **FREEFALL_MIN_SAMPLES** – minimalna liczba próbek, przez które spadek musi trwać, aby został uznany.
-- **IMPACT_THRESHOLD** – minimalna wartość przyspieszenia po spadku, interpretowana jako uderzenie.
-- **IMPACT_DELTA_MIN** – różnica wartości między kolejnymi próbkami, aby odróżnić uderzenie od machania.
-- **DEBOUNCE_TIME_MS** – minimalny czas pomiędzy kolejnymi detekcjami upadków.
-### Ograniczenia algorytmu manualnego
-- wrażliwość na ustawione parametry progowe,
-- trudności z odróżnieniem nietypowych ruchów od faktycznego upadku,
-- możliwe fałszywe alarmy przy szybkim machaniu modułem.
 
-## 7. Uczenie maszynowe
-### 7.1. Okna czasowe
-Pojedyńcza próbka `X, Y, Z` nie niesie wystarczającej informacji. Zamiast tego stosowano **okna czasowe** (np. 150–160 próbek).
-Dla każdego okna liczono dodatkowe cechy (features), aby ująć **dynamikę sygnału w czasie**, a nie tylko chwilowe wartości.
+### Limitations of the manual algorithm
 
-### 7.2. Ekstrahowane cechy
-Dla każdej osi **X, Y, Z**, a także sygnałów pochodnych:
-- **A** – całkowite przyspieszenie $\sqrt{X^2 + Y^2 + Z^2}$,
-- **DX, DY, DZ, DA** – różnice kolejnych próbek,
-```python
-df = pd.read_csv('data/nowe_dane.csv')
+-   sensitivity to chosen threshold values,
+-   difficulty in distinguishing unusual movements from real falls,
+-   possible false positives from rapid hand movements.
+
+## 7. Machine Learning
+
+### 7.1. Time Windows
+
+A single `X, Y, Z` sample is not enough. Instead, **time windows** (150-160 samples) were used. From each window, statistical features were calculated to capture **signal dynamics over time**, not just instantaneous values.
+
+### 7.2. Extracted Features
+
+For each axis **X, Y, Z** and derived signals: 
+- **A** - total acceleration $\sqrt{X^2 + Y^2 + Z^2}$,
+- **DX, DY, DZ, DA** - differences between consecutive samples,
+
+``` python
+df = pd.read_csv('data/new_data.csv')
 df["A"] = np.sqrt(df["X"]**2 + df["Y"]**2 + df["Z"]**2)
 df["DX"] = df["X"].diff().fillna(0)
 df["DY"] = df["Y"].diff().fillna(0)
@@ -112,13 +118,13 @@ df["DA"] = df["A"].diff().fillna(0)
 df.to_csv("data/train_features.csv", index=False)
 ```
 
-wyliczano zestaw cech statystycznych:
-- średnia `mean`,
-- odchylenie standardowe `std`,
-- minimum i maksimum `min`,`max`,
-- zakres `max – min`,
-- energia sygnału `sum(x^2)`.
-```python
+Statistical features: - mean `mean`, 
+- standard deviation `std`,
+- minimum and maximum `min`,`max`,
+- range `max – min`,
+- signal energy `sum(x^2)`.
+
+``` python
 def extract_features(window):
     features = {}
     for col in ["X", "Y", "Z", "A", "DX", "DY", "DZ", "DA"]:
@@ -133,30 +139,33 @@ def extract_features(window):
     return features
 ```
 
-Te cechy tworzyły wektor wejściowy dla modelu ML.
+### 7.3. ML Models
 
-### 7.3. Modele ML
-Przetestowane modele:
-- **Random Forest** (200 drzew, z balansowaniem klas),
-- **XGBoost** (200 drzew, `scale_pos_weight` dla klas niezrównoważonych).
-Oba modele działały dobrze, jednak **ostatecznie wybrano Random Forest**, ponieważ dawał wysoką dokładność i był prostszy do wdrożenia.
-### Zalety uczenia maszynowego
-- większa odporność na nietypowe ruchy,
-- możliwość adaptacji modelu do nowych danych,
-- mniejsza liczba fałszywych alarmów.
+Tested models: 
+- **Random Forest** (200 trees, class balancing),
+- **XGBoost** (200 trees, `scale_pos_weight` for imbalanced data).
+Final choice: **Random Forest**, providing high accuracy and easier deployment.
 
-## 8. Analiza danych w Jupyter Notebook
-### 8.1. Wykrywanie upadku przez algorytm manualny
-![Instrukcja](Plots/manual.png)
-### 8.2. Wykrywanie upadku przez model
-![Instrukcja](Plots/model.png)
-### 8.3. Porównanie algorytmów
-Do porównania wykorzystano program `rx_adxl_with_ml.py`, który równolegle odbierał dane, stosował algorytm manualny oraz predykcję modelu.
-W sygnale testowym były dwa rzeczywiste upadki, które zostały poprawnie wykryte przez model.
-![Instrukcja](Plots/modelvsmanual.png)
+### Advantages of ML
 
-## 9. Możliwe rozszerzenia
-- Wdrożenie modelu ML bezpośrednio na mikrokontrolerze (np. przy użyciu **STM32Cube.AI**).
-- Dodanie komunikacji bezprzewodowej (Bluetooth, WiFi) zamiast USB.
-- Rozszerzenie o dodatkowe czujniki (np. żyroskop, barometr).
-- Wprowadzenie klasyfikacji typów upadków (np. upadek do przodu, na bok, do tyłu).
+-   more robust to unusual movements,
+-   model can adapt to new data,
+-   fewer false alarms.
+
+## 8. Data Analysis in Jupyter Notebook
+
+### 8.1. Fall detection with manual algorithm
+![Manual](Plots/manual.png)
+### 8.2. Fall detection with ML model
+![Model](Plots/model.png)
+### 8.3. Algorithm comparison 
+The program `rx_adxl_with_ml.py` was used for comparison, simultaneously applying manual algorithm and ML prediction. In the test signal, two real falls occurred, both **correctly detected** by the ML model.
+![Comparison](Plots/modelvsmanual.png)
+
+## 9. Possible Extensions
+
+-   Deploy ML model directly on microcontroller using **STM32Cube.AI**,
+-   Add wireless communication (Bluetooth, WiFi) instead of USB,
+-   Extend with additional sensors (gyroscope, barometer),
+-   Introduce classification of fall types (forward, sideways,
+    backward).
